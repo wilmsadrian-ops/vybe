@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VYBE – Orte, die zu dir passen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --coral:#FF6A4D; --calm:#2E7D8A; --mint:#35D6A4; --sun:#FFC83D;
+  --bg:#FFF9F1; --surface:#FFFFFF; --ink:#17303A; --muted:#55696F; --line:#DCE9E8;
+  --on-color:#17303A;
+  --display:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;
+  --body:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F2229; --surface:#17323B; --ink:#EEF8F8; --muted:#A8C2C6; --line:#284852;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F2229; --surface:#17323B; --ink:#EEF8F8; --muted:#A8C2C6; --line:#284852;
+  color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;letter-spacing:-.01em}
+:focus-visible{outline:3px solid var(--calm);outline-offset:2px}
+#app{max-width:480px;margin:0 auto;height:100%;display:flex;flex-direction:column;position:relative}
+main{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 18px 110px;-webkit-overflow-scrolling:touch}
+
+/* Tab bar */
+.tabbar{position:fixed;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;display:flex;background:var(--surface);border-top:1px solid var(--line);padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));z-index:20}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border-radius:14px;font-size:12px;font-weight:700;color:var(--muted)}
+.tab .ic{font-size:22px;line-height:1}
+.tab[aria-current="page"]{color:var(--calm);background:color-mix(in srgb,var(--calm) 12%,transparent)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tab[aria-current="page"]{color:#8FD3DD}}
+
+/* Hero */
+.hero{position:relative;margin:14px 0 0;padding:26px 22px 24px;border-radius:30px;background:var(--calm);color:#fff;overflow:hidden}
+.hero .blob{position:absolute;border-radius:50%}
+.b1{width:150px;height:150px;background:var(--coral);right:-40px;top:-50px}
+.b2{width:90px;height:90px;background:var(--sun);right:60px;top:70px}
+.b3{width:120px;height:120px;background:var(--mint);right:-30px;bottom:-50px}
+.hero>*:not(.blob){position:relative}
+.logo{font-family:var(--display);font-weight:800;font-size:44px;letter-spacing:-.03em}
+.hero p{margin:6px 0 18px;max-width:240px;font-size:17px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 22px;border-radius:999px;background:var(--coral);color:var(--on-color);font-weight:700;font-size:16px}
+.btn.ghost{background:transparent;border:2px solid var(--line);color:var(--ink)}
+.btn.sun{background:var(--sun)}
+.btn.block{width:100%}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.hello{font-family:var(--display);font-size:26px;margin:22px 0 4px}
+.sub{color:var(--muted);margin:0 0 14px}
+.sec{display:flex;align-items:baseline;justify-content:space-between;margin:26px 0 12px}
+.sec h2{font-size:21px}
+.link{color:var(--calm);font-weight:700;font-size:14px}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .link{color:#8FD3DD}}
+
+/* Moods */
+.moods{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mood{padding:16px 14px;border-radius:22px;text-align:left;color:var(--on-color);font-weight:700;display:flex;flex-direction:column;gap:6px;min-height:92px}
+.mood .ic{font-size:26px}
+.mood small{font-weight:500;opacity:.8}
+.m-coral{background:var(--coral)}.m-mint{background:var(--mint)}.m-sun{background:var(--sun)}.m-calm{background:var(--calm);color:#fff}
+
+/* Chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:40px;padding:0 15px;border-radius:999px;border:2px solid var(--line);background:var(--surface);font-weight:500;font-size:15px;display:inline-flex;align-items:center;gap:6px}
+.chip[aria-pressed="true"]{background:var(--calm);border-color:var(--calm);color:#fff;font-weight:700}
+.scroll-x{display:flex;gap:8px;overflow-x:auto;padding:2px 18px 6px;margin:0 -18px;scrollbar-width:none}
+.scroll-x::-webkit-scrollbar{display:none}
+.scroll-x .chip{flex:none}
+
+/* Place cards */
+.hscroll{display:flex;gap:14px;overflow-x:auto;margin:0 -18px;padding:2px 18px 10px;scroll-snap-type:x mandatory;scrollbar-width:none}
+.hscroll::-webkit-scrollbar{display:none}
+.card{background:var(--surface);border-radius:26px;overflow:hidden;border:1px solid var(--line);text-align:left;display:block;width:100%}
+.hscroll .card{flex:none;width:250px;scroll-snap-align:start}
+.cover{position:relative;height:112px;display:flex;align-items:center;justify-content:center;font-size:52px}
+.cv0{background:var(--coral)}.cv1{background:var(--calm)}.cv2{background:var(--mint)}.cv3{background:var(--sun)}
+.badge{position:absolute;left:12px;bottom:-14px;background:var(--surface);color:var(--ink);border:2px solid var(--mint);border-radius:999px;padding:3px 11px;font-weight:700;font-size:14px;font-family:var(--display)}
+.fav{position:absolute;right:10px;top:10px;width:40px;height:40px;border-radius:50%;background:var(--surface);color:var(--coral);font-size:20px;display:flex;align-items:center;justify-content:center}
+.fav[aria-pressed="true"]{background:var(--coral);color:var(--on-color)}
+.card .body{padding:22px 14px 14px}
+.card h3{font-size:19px}
+.meta{color:var(--muted);font-size:14px;margin-top:4px}
+.list{display:flex;flex-direction:column;gap:16px}
+.demo{display:inline-block;background:color-mix(in srgb,var(--sun) 35%,transparent);border:1px dashed var(--sun);border-radius:10px;padding:2px 8px;font-size:12px;font-weight:700;margin-left:6px;vertical-align:middle}
+
+/* Search */
+.search{width:100%;min-height:48px;border-radius:999px;border:2px solid var(--line);background:var(--surface);padding:0 18px;font:inherit;color:var(--ink);margin:6px 0 12px}
+.search:focus{border-color:var(--calm);outline:none}
+
+/* Onboarding */
+.onb{padding-top:20px}
+.dots{display:flex;gap:6px;margin-bottom:22px}
+.dots i{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.dots i.on{background:var(--coral)}
+.onb h1{font-size:32px;margin-bottom:8px}
+.slider-row{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:16px;margin-bottom:12px}
+.slider-row .top{display:flex;justify-content:space-between;font-weight:700;margin-bottom:6px}
+.slider-row .top span:last-child{color:var(--calm)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .slider-row .top span:last-child{color:#8FD3DD}}
+.ends{display:flex;justify-content:space-between;color:var(--muted);font-size:13px}
+input[type=range]{width:100%;accent-color:var(--coral);height:36px}
+.footer-actions{display:flex;gap:10px;margin-top:22px}
+.footer-actions .btn{flex:1}
+
+/* Detail overlay */
+.overlay{position:fixed;inset:0;z-index:40;background:var(--bg);overflow-y:auto;padding-bottom:40px}
+.overlay .inner{max-width:480px;margin:0 auto;min-height:100%;position:relative}
+.dcover{height:230px;display:flex;align-items:center;justify-content:center;font-size:92px;position:relative;padding-top:env(safe-area-inset-top,0px)}
+.back{position:absolute;left:14px;top:calc(env(safe-area-inset-top,0px) + 12px);width:44px;height:44px;border-radius:50%;background:var(--surface);font-size:20px;display:flex;align-items:center;justify-content:center;z-index:2}
+.dfav{left:auto;right:14px;color:var(--coral)}
+.dfav[aria-pressed="true"]{background:var(--coral);color:var(--on-color)}
+.dbody{padding:0 18px;margin-top:-26px;position:relative}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:26px;padding:18px;margin-bottom:14px}
+.panel h2{font-size:20px;margin-bottom:10px}
+.ring{--p:80;width:92px;height:92px;border-radius:50%;background:conic-gradient(var(--mint) calc(var(--p)*1%),var(--line) 0);display:grid;place-items:center;flex:none}
+.ring div{width:72px;height:72px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:24px}
+.matchhead{display:flex;gap:16px;align-items:center;margin-bottom:12px}
+.matchhead h3{font-size:20px}
+.why{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:12px}
+.why li{display:flex;gap:10px;align-items:flex-start}
+.why .ico{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:800;color:var(--on-color)}
+.ok{background:var(--mint)}.mid{background:var(--sun)}.no{background:var(--coral)}
+.why b{display:block}
+.why span.t{color:var(--muted);font-size:14px}
+.pill{display:inline-block;border-radius:999px;padding:4px 12px;font-size:14px;font-weight:700;background:color-mix(in srgb,var(--mint) 30%,transparent);margin:0 6px 6px 0}
+.pill.t2{background:color-mix(in srgb,var(--calm) 18%,transparent)}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fact{background:var(--bg);border-radius:16px;padding:10px 12px;font-size:14px}
+.fact b{display:block;font-size:13px;color:var(--muted);font-weight:500}
+.review{border-top:1px solid var(--line);padding:12px 0}
+.review:first-of-type{border-top:0}
+.stars{color:var(--sun);letter-spacing:2px}
+.note{font-size:13px;color:var(--muted)}
+
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.thumb{aspect-ratio:1;border-radius:16px;background-size:cover;background-position:center;background-color:var(--line)}
+label.btn{cursor:pointer}
+/* Sheet */
+.scrim{position:fixed;inset:0;z-index:60;background:rgba(10,30,36,.55);display:flex;align-items:flex-end;justify-content:center}
+.sheet{width:100%;max-width:480px;max-height:92%;overflow-y:auto;background:var(--surface);border-radius:28px 28px 0 0;padding:20px 18px calc(24px + env(safe-area-inset-bottom,0px))}
+.sheet h2{font-size:24px;margin-bottom:4px}
+.starpick{display:flex;gap:4px;margin:6px 0 14px}
+.starpick button{font-size:38px;line-height:1;color:var(--line);width:48px;height:48px}
+.starpick button.on{color:var(--sun)}
+label.l{display:block;font-weight:700;margin:14px 0 8px}
+textarea{width:100%;min-height:100px;border-radius:18px;border:2px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;padding:12px;resize:vertical}
+textarea:focus{border-color:var(--calm);outline:none}
+.seg{display:flex;gap:8px}
+.seg .chip{flex:1;justify-content:center}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:999px;font-weight:700;z-index:80;max-width:90%;text-align:center}
+.empty{text-align:center;padding:40px 10px;color:var(--muted)}
+.empty .big{font-size:56px}
+.empty h2{color:var(--ink);font-size:22px;margin:8px 0}
+@media (prefers-reduced-motion:no-preference){
+  .overlay{animation:rise .25s ease-out}
+  @keyframes rise{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ============ BEISPIELDATEN (alles erfunden – keine echten Orte) ============ */
+const CATS = [
+  {id:'Café',icon:'☕'},{id:'Restaurant',icon:'🍽️'},{id:'Park',icon:'🌳'},
+  {id:'Kino',icon:'🎬'},{id:'Sehenswürdigkeit',icon:'🏛️'},{id:'Kultur',icon:'🎨'},
+  {id:'Bar',icon:'🎶'},{id:'Markt',icon:'🛍️'}
+];
+const INTERESTS = ['Kaffee & Kuchen','Vegan','Street Food','Natur','Fotografie','Indie-Film','Architektur','Kunst','Live-Musik','Ruhe','Social','Familie','Sport','Nachtleben','Geschichte','Lesen'];
+const MOODS = [
+  {id:'Chillen',icon:'🛋️',sub:'Ruhig & entspannt',cls:'m-mint',tags:['Ruhe','Lesen','Natur']},
+  {id:'Genuss',icon:'🍰',sub:'Lecker & gemütlich',cls:'m-sun',tags:['Kaffee & Kuchen','Vegan','Street Food']},
+  {id:'Abenteuer',icon:'🧭',sub:'Raus & erleben',cls:'m-coral',tags:['Natur','Sport','Nachtleben','Live-Musik']},
+  {id:'Kultur',icon:'🎭',sub:'Inspiration tanken',cls:'m-calm',tags:['Kunst','Architektur','Indie-Film','Geschichte']}
+];
+const DIMS = {
+  lively:{label:'Atmosphäre',words:['ruhig','gemischt','lebendig'],lo:'ruhig',hi:'lebendig'},
+  fancy:{label:'Stil',words:['unkompliziert','gepflegt','edel'],lo:'unkompliziert',hi:'edel'},
+  outdoor:{label:'Ort',words:['drinnen','drinnen & draußen','draußen'],lo:'drinnen',hi:'draußen'}
+};
+const PLACES = [
+  {id:1,name:'Café Lila Lotte',cat:'Café',emoji:'☕',tags:['Kaffee & Kuchen','Ruhe','Lesen'],v:{lively:25,fancy:40,outdoor:30},price:2,km:0.6,hours:'8–19 Uhr',rating:4.7,desc:'Kleines Eckcafé mit Bücherregal, Sesseln am Fenster und selbstgebackenem Zitronenkuchen.',addr:'Beispielgasse 12'},
+  {id:2,name:'Mint & Mohn',cat:'Café',emoji:'🥐',tags:['Kaffee & Kuchen','Vegan','Social'],v:{lively:60,fancy:35,outdoor:45},price:2,km:1.1,hours:'9–18 Uhr',rating:4.5,desc:'Veganes Frühstück, Hafer-Flat-White und lange Tische, an denen man schnell ins Gespräch kommt.',addr:'Probeweg 3'},
+  {id:3,name:'Tigerlilie',cat:'Restaurant',emoji:'🍜',tags:['Street Food','Social','Nachtleben'],v:{lively:82,fancy:30,outdoor:20},price:1,km:1.8,hours:'12–23 Uhr',rating:4.4,desc:'Laute, bunte Nudelbar mit offener Küche. Geteilt wird hier alles – auch der Nachtisch.',addr:'Musterplatz 7'},
+  {id:4,name:'Salbei & Salz',cat:'Restaurant',emoji:'🥗',tags:['Vegan','Ruhe','Familie'],v:{lively:35,fancy:72,outdoor:45},price:3,km:2.3,hours:'17–22 Uhr',rating:4.8,desc:'Saisonales Menü mit viel Gemüse, ruhiger Innenhof und Kinderteller mit echtem Anspruch.',addr:'Beispielallee 41'},
+  {id:5,name:'Stadtwiese Süd',cat:'Park',emoji:'🌳',tags:['Natur','Sport','Familie','Ruhe'],v:{lively:45,fancy:8,outdoor:100},price:1,km:1.4,hours:'immer offen',rating:4.6,desc:'Große Liegewiese, Laufrunde mit weichem Belag und ein Spielplatz hinter den alten Linden.',addr:'Parkring 1'},
+  {id:6,name:'Hügelpark Aussicht',cat:'Park',emoji:'🌅',tags:['Natur','Fotografie','Ruhe'],v:{lively:18,fancy:10,outdoor:100},price:1,km:3.9,hours:'immer offen',rating:4.9,desc:'Kurzer Anstieg, weiter Blick über die Dächer. Zum Sonnenuntergang am schönsten.',addr:'Aussichtsweg 9'},
+  {id:7,name:'Kino Kolibri',cat:'Kino',emoji:'🎬',tags:['Indie-Film','Kunst','Nachtleben'],v:{lively:45,fancy:50,outdoor:5},price:2,km:2.0,hours:'ab 17 Uhr',rating:4.6,desc:'Zwei Säle, rote Samtsessel, Originalfassungen und kurze Gespräche mit Filmleuten nach der Vorstellung.',addr:'Beispielstraße 28'},
+  {id:8,name:'Lichtspiele am Kanal',cat:'Kino',emoji:'🍿',tags:['Indie-Film','Familie','Geschichte'],v:{lively:50,fancy:38,outdoor:10},price:2,km:2.7,hours:'ab 14 Uhr',rating:4.3,desc:'Traditionskino aus den 50ern mit Familienmatinee am Sonntag und Klassiker-Reihe.',addr:'Kanalufer 5'},
+  {id:9,name:'Alter Wasserturm',cat:'Sehenswürdigkeit',emoji:'🏛️',tags:['Architektur','Geschichte','Fotografie'],v:{lively:40,fancy:45,outdoor:70},price:1,km:3.2,hours:'10–17 Uhr',rating:4.5,desc:'Backsteinturm von 1898 mit Führungen, Aussichtsgalerie und fotogener Wendeltreppe.',addr:'Turmstraße 2'},
+  {id:10,name:'Galerie Zwischenraum',cat:'Kultur',emoji:'🎨',tags:['Kunst','Architektur','Ruhe'],v:{lively:30,fancy:68,outdoor:8},price:1,km:1.6,hours:'Di–So 11–18 Uhr',rating:4.4,desc:'Wechselnde Ausstellungen junger Künstler:innen in einer ehemaligen Druckerei. Eintritt frei.',addr:'Probehof 6'},
+  {id:11,name:'Plattenbau Bar',cat:'Bar',emoji:'🎶',tags:['Live-Musik','Nachtleben','Social'],v:{lively:92,fancy:38,outdoor:15},price:2,km:2.5,hours:'ab 20 Uhr',rating:4.2,desc:'Kleine Bühne, kühle Drinks und donnerstags offene Session. Hier wird getanzt.',addr:'Beispielring 19'},
+  {id:12,name:'Markthalle 7',cat:'Markt',emoji:'🛍️',tags:['Street Food','Social','Fotografie'],v:{lively:86,fancy:25,outdoor:40},price:2,km:1.3,hours:'Do–Sa 11–21 Uhr',rating:4.6,desc:'Dutzende Stände unter Stahlträgern: Dumplings, Käse, Kaffee – und viel zu schauen.',addr:'Hallenweg 7'}
+];
+const SAMPLE_REVIEWS = {
+  1:[{n:'Mia (Beispiel)',s:5,t:'Perfekt zum Lesen. Der Kuchen war ausverkauft, als ich um vier kam.'}],
+  5:[{n:'Jonas (Beispiel)',s:4,t:'Sonntags ziemlich voll, unter der Woche herrlich ruhig.'}],
+  7:[{n:'Lea (Beispiel)',s:5,t:'Tolles Programm, die Sessel sind bequem.'}]
+};
+const ASPECTS = ['Atmosphäre','Service','Preis-Leistung','Geschmack','Sauberkeit','Lage'];
+
+/* ============ STATE ============ */
+const DEFAULT = {onboarded:false,step:0,interests:[],vibe:{lively:50,fancy:50,outdoor:50},favs:[],reviews:{},tab:'home',cat:'Alle',mood:null,q:'',detail:null,sheet:null};
+let S = JSON.parse(JSON.stringify(DEFAULT));
+try{ const saved = JSON.parse(localStorage.getItem('vybe-state')||'null'); if(saved){ S.onboarded=saved.onboarded; S.interests=saved.interests||[]; S.vibe=saved.vibe||S.vibe; S.favs=saved.favs||[]; S.reviews=saved.reviews||{}; } }catch(e){}
+function save(){ try{ localStorage.setItem('vybe-state',JSON.stringify({onboarded:S.onboarded,interests:S.interests,vibe:S.vibe,favs:S.favs,reviews:S.reviews})); }catch(e){} }
+
+let PHOTOS = {};
+try{ PHOTOS = JSON.parse(localStorage.getItem('vybe-photos')||'{}')||{}; }catch(e){}
+function savePhotos(){ try{ localStorage.setItem('vybe-photos',JSON.stringify(PHOTOS)); return true; }catch(e){ return false; } }
+const coverStyle = p => (PHOTOS[p.id]&&PHOTOS[p.id][0]) ? ` style="background-image:url(${PHOTOS[p.id][0]});background-size:cover;background-position:center"` : '';
+const coverEmoji = p => (PHOTOS[p.id]&&PHOTOS[p.id][0]) ? '' : p.emoji;
+
+/* ============ MATCH-LOGIK ============ */
+function bucket(v){ return v<34?0:v<67?1:2; }
+function match(p){
+  const hits = p.tags.filter(t=>S.interests.includes(t));
+  const tagPart = S.interests.length ? Math.min(1, hits.length/Math.min(p.tags.length,2)) : 0.5;
+  const diffs = Object.keys(DIMS).map(k=>({k,d:Math.abs(S.vibe[k]-p.v[k])}));
+  const vibePart = 1 - diffs.reduce((a,x)=>a+x.d,0)/diffs.length/100;
+  const score = Math.round(100*(0.55*tagPart+0.45*vibePart));
+  return {score,hits,diffs};
+}
+function tier(s){ return s>=85?'Perfekter Vibe':s>=70?'Starker Match':s>=50?'Könnte passen':'Eher nicht dein Ding'; }
+const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const euro = n => '€'.repeat(n);
+const stars = n => '★'.repeat(n)+'☆'.repeat(5-n);
+const place = id => PLACES.find(p=>p.id===id);
+const isFav = id => S.favs.includes(id);
+
+/* ============ KOMPONENTEN ============ */
+function card(p,i){
+  const m = match(p);
+  return `<article class="card" style="position:relative">
+    <div class="cover cv${i%4}"${coverStyle(p)} data-open="${p.id}" role="button" tabindex="0" aria-label="${esc(p.name)} öffnen">${coverEmoji(p)}
+      <span class="badge">${m.score}% Match</span>
+    </div>
+    <button class="fav" data-fav="${p.id}" aria-pressed="${isFav(p.id)}" aria-label="Favorit">${isFav(p.id)?'♥':'♡'}</button>
+    <div class="body" data-open="${p.id}" role="button" tabindex="0">
+      <h3>${esc(p.name)}</h3>
+      <div class="meta">${p.cat} · ${euro(p.price)} · ${p.km} km</div>
+    </div>
+  </article>`;
+}
+function topMatches(){ return [...PLACES].sort((a,b)=>match(b).score-match(a).score); }
+
+/* ============ SCREENS ============ */
+function viewHome(){
+  const top = topMatches().slice(0,5);
+  return `<main>
+    <section class="hero">
+      <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+      <div class="logo">VYBE</div>
+      <p>Finde Orte, die sich nach dir anfühlen.</p>
+      <button class="btn" data-tab="discover">Orte entdecken</button>
+    </section>
+    <p class="hello">Wonach ist dir heute?</p>
+    <p class="sub">Wähle eine Stimmung – wir sortieren passend.</p>
+    <div class="moods">${MOODS.map(m=>`<button class="mood ${m.cls}" data-mood="${m.id}"><span class="ic">${m.icon}</span>${m.id}<small>${m.sub}</small></button>`).join('')}</div>
+    <div class="sec"><h2>Deine Top-Matches</h2><button class="link" data-tab="discover">Alle ansehen</button></div>
+    <div class="hscroll">${top.map((p,i)=>card(p,i)).join('')}</div>
+    <div class="sec"><h2>Kategorien</h2></div>
+    <div class="chips">${CATS.map(c=>`<button class="chip" data-cat="${c.id}">${c.icon} ${c.id}</button>`).join('')}</div>
+    <p class="note" style="margin-top:26px">Alle Orte, Bewertungen und Zahlen sind <b>Beispieldaten</b> und nicht echt.</p>
+  </main>`;
+}
+
+function filtered(){
+  let list = [...PLACES];
+  if(S.cat!=='Alle') list = list.filter(p=>p.cat===S.cat);
+  if(S.mood){ const m = MOODS.find(x=>x.id===S.mood); list = list.filter(p=>p.tags.some(t=>m.tags.includes(t))); }
+  const q = S.q.trim().toLowerCase();
+  if(q) list = list.filter(p=>(p.name+' '+p.cat+' '+p.tags.join(' ')).toLowerCase().includes(q));
+  return list.sort((a,b)=>match(b).score-match(a).score);
+}
+function listHtml(){
+  const l = filtered();
+  if(!l.length) return `<div class="empty"><div class="big">🔍</div><h2>Nichts gefunden</h2><p>Ändere die Kategorie oder den Suchbegriff.</p></div>`;
+  return `<div class="list">${l.map((p,i)=>card(p,i)).join('')}</div>`;
+}
+function viewDiscover(){
+  return `<main>
+    <h1 style="font-size:30px;margin:22px 0 4px">Entdecken<span class="demo">Beispieldaten</span></h1>
+    <p class="sub">Sortiert nach deinem VYBE-Match.</p>
+    <input class="search" id="q" type="search" placeholder="Suche nach Ort, Kategorie oder Thema" value="${esc(S.q)}" aria-label="Suche">
+    <div class="scroll-x" role="group" aria-label="Kategorien">
+      ${['Alle',...CATS.map(c=>c.id)].map(c=>`<button class="chip" data-cat="${c}" aria-pressed="${S.cat===c}">${c}</button>`).join('')}
+    </div>
+    ${S.mood?`<div style="margin:10px 0"><button class="chip" data-mood="" aria-pressed="true">Stimmung: ${S.mood} ✕</button></div>`:''}
+    <div id="list" style="margin-top:14px">${listHtml()}</div>
+  </main>`;
+}
+
+function viewFavs(){
+  const l = S.favs.map(place).filter(Boolean);
+  return `<main>
+    <h1 style="font-size:30px;margin:22px 0 14px">Favoriten</h1>
+    ${l.length?`<div class="list">${l.map((p,i)=>card(p,i)).join('')}</div>`:
+    `<div class="empty"><div class="big">💜</div><h2>Noch keine Favoriten</h2><p>Tippe bei einem Ort auf das Herz, dann taucht er hier auf.</p><br><button class="btn" data-tab="discover">Orte entdecken</button></div>`}
+  </main>`;
+}
+
+function viewProfile(){
+  const myRev = Object.entries(S.reviews).reduce((a,[,v])=>a+v.length,0);
+  return `<main>
+    <h1 style="font-size:30px;margin:22px 0 4px">Dein VYBE</h1>
+    <p class="sub">Daraus berechnen wir deine Matches.</p>
+    <div class="panel"><h2>Interessen</h2>
+      ${S.interests.length?S.interests.map(t=>`<span class="pill">${esc(t)}</span>`).join(''):'<p class="note">Noch keine gewählt.</p>'}
+    </div>
+    <div class="panel"><h2>Stimmung</h2>
+      ${Object.keys(DIMS).map(k=>`<span class="pill t2">${DIMS[k].label}: ${DIMS[k].words[bucket(S.vibe[k])]}</span>`).join('')}
+    </div>
+    <div class="panel"><h2>Aktivität</h2><p style="margin:0">${S.favs.length} Favoriten · ${myRev} Bewertungen</p></div>
+    <button class="btn block" data-redo>Interessen ändern</button>
+    <button class="btn ghost block" data-reset style="margin-top:10px">Alles zurücksetzen</button>
+  </main>`;
+}
+
+function viewOnboarding(){
+  const d = n=>`<i class="${S.step>=n?'on':''}"></i>`;
+  let body='';
+  if(S.step===0){
+    body = `<h1>Was magst du?</h1><p class="sub">Wähle mindestens 3 Interessen.</p>
+      <div class="chips">${INTERESTS.map(t=>`<button class="chip" data-int="${esc(t)}" aria-pressed="${S.interests.includes(t)}">${esc(t)}</button>`).join('')}</div>
+      <div class="footer-actions"><button class="btn" id="next0" data-next ${S.interests.length<3?'disabled':''}>Weiter (${S.interests.length}/3)</button></div>`;
+  } else if(S.step===1){
+    body = `<h1>Welcher Vibe?</h1><p class="sub">Ziehe die Regler – es gibt kein Richtig oder Falsch.</p>
+      ${Object.keys(DIMS).map(k=>`<div class="slider-row"><div class="top"><span>${DIMS[k].label}</span><span id="w-${k}">${DIMS[k].words[bucket(S.vibe[k])]}</span></div>
+        <input type="range" min="0" max="100" value="${S.vibe[k]}" data-range="${k}" aria-label="${DIMS[k].label}">
+        <div class="ends"><span>${DIMS[k].lo}</span><span>${DIMS[k].hi}</span></div></div>`).join('')}
+      <div class="footer-actions"><button class="btn ghost" data-back>Zurück</button><button class="btn" data-next>Weiter</button></div>`;
+  } else {
+    body = `<h1>Fertig! 🎉</h1><p class="sub">Dein VYBE steht. Ab jetzt zeigt dir jeder Ort, wie gut er zu dir passt – und warum.</p>
+      <div class="panel"><h2>Du magst</h2>${S.interests.map(t=>`<span class="pill">${esc(t)}</span>`).join('')}
+      <h2 style="margin-top:8px">Dein Stil</h2>${Object.keys(DIMS).map(k=>`<span class="pill t2">${DIMS[k].words[bucket(S.vibe[k])]}</span>`).join('')}</div>
+      <div class="footer-actions"><button class="btn ghost" data-back>Zurück</button><button class="btn sun" data-finish>Los geht’s</button></div>`;
+  }
+  return `<main class="onb"><div class="dots">${d(0)}${d(1)}${d(2)}</div>${body}</main>`;
+}
+
+function viewDetail(){
+  const p = place(S.detail), m = match(p), i = PLACES.indexOf(p);
+  const mine = (S.reviews[p.id]||[]).slice().reverse();
+  const ph = PHOTOS[p.id]||[];
+  const revs = [...mine.map(r=>({...r,n:'Du'})), ...(SAMPLE_REVIEWS[p.id]||[])];
+  const rows = [];
+  if(S.interests.length){
+    if(m.hits.length) rows.push(`<li><span class="ico ok">✓</span><div><b>Passt zu deinen Interessen</b><span class="t">${m.hits.map(esc).join(', ')} – das hast du gewählt.</span></div></li>`);
+    else rows.push(`<li><span class="ico no">!</span><div><b>Keine gemeinsamen Interessen</b><span class="t">Hier geht es um ${p.tags.map(esc).join(', ')}.</span></div></li>`);
+  }
+  m.diffs.forEach(({k,d})=>{
+    const D=DIMS[k], you=D.words[bucket(S.vibe[k])], pl=D.words[bucket(p.v[k])];
+    if(d<=20) rows.push(`<li><span class="ico ok">✓</span><div><b>${D.label}: passt</b><span class="t">Du magst es ${you}, der Ort ist ${pl}.</span></div></li>`);
+    else if(d<=45) rows.push(`<li><span class="ico mid">~</span><div><b>${D.label}: teils</b><span class="t">Du magst es ${you}, der Ort ist eher ${pl}.</span></div></li>`);
+    else rows.push(`<li><span class="ico no">!</span><div><b>${D.label}: weicht ab</b><span class="t">Du magst es ${you}, der Ort ist ${pl}.</span></div></li>`);
+  });
+  return `<div class="overlay" role="dialog" aria-label="${esc(p.name)}"><div class="inner">
+    <div class="dcover cv${i%4}"${coverStyle(p)}>${coverEmoji(p)}
+      <button class="back" data-close aria-label="Zurück">←</button>
+      <button class="back dfav" data-fav="${p.id}" aria-pressed="${isFav(p.id)}" aria-label="Favorit">${isFav(p.id)?'♥':'♡'}</button>
+    </div>
+    <div class="dbody">
+      <div class="panel">
+        <h1 style="font-size:28px">${esc(p.name)}</h1>
+        <div class="meta">${p.cat} · ${euro(p.price)} · ★ ${p.rating.toFixed(1)}<span class="demo">Beispiel</span></div>
+        <p style="margin:12px 0 0">${esc(p.desc)}</p>
+      </div>
+      <div class="panel">
+        <div class="matchhead"><div class="ring" style="--p:${m.score}"><div>${m.score}%</div></div>
+          <div><h3>${tier(m.score)}</h3><span class="note">So kommt dein VYBE-Match zustande:</span></div></div>
+        <ul class="why">${rows.join('')}</ul>
+        <p class="note" style="margin:14px 0 0">55 % Interessen, 45 % Stimmung.</p>
+      </div>
+      <div class="panel"><h2>Infos</h2>
+        <div class="facts">
+          <div class="fact"><b>Öffnungszeiten</b>${esc(p.hours)}</div>
+          <div class="fact"><b>Entfernung</b>${p.km} km</div>
+          <div class="fact"><b>Adresse</b>${esc(p.addr)}</div>
+          <div class="fact"><b>Preis</b>${euro(p.price)}</div>
+        </div>
+        <div style="margin-top:12px">${p.tags.map(t=>`<span class="pill ${S.interests.includes(t)?'':'t2'}">${esc(t)}</span>`).join('')}</div>
+      </div>
+      <div class="panel"><h2>So sieht es dort aus</h2>
+        ${ph.length?`<div class="gallery">${ph.map((u,j)=>`<button class="thumb" data-photo="${j}" style="background-image:url(${u})" aria-label="Foto ${j+1} ansehen"></button>`).join('')}</div>`:'<p class="note">Noch keine Fotos. Zeig anderen, wie es dort wirklich aussieht.</p>'}
+        <label class="btn block" for="photoin">📷 Foto hinzufügen</label>
+        <input id="photoin" type="file" accept="image/*" hidden>
+        <p class="note" style="margin:10px 0 0">Fotos bleiben vorerst nur auf diesem Gerät.</p>
+      </div>
+      <div class="panel"><h2>Bewertungen</h2>
+        ${revs.length?revs.map(r=>`<div class="review"><div><b>${esc(r.n)}</b> <span class="stars">${stars(r.s)}</span></div>${r.a&&r.a.length?`<div class="note">${r.a.map(esc).join(' · ')}</div>`:''}${r.f?`<div class="note">VYBE-Passung: ${esc(r.f)}</div>`:''}<div>${esc(r.t)}</div></div>`).join(''):'<p class="note">Noch keine Bewertungen.</p>'}
+        <button class="btn block" data-review="${p.id}" style="margin-top:12px">Bewertung schreiben</button>
+      </div>
+    </div></div></div>`;
+}
+
+function viewLightbox(){
+  const u=(PHOTOS[S.detail]||[])[S.photoView]; if(!u) return '';
+  return `<div class="scrim" style="align-items:center;z-index:90" data-lbclose><div style="width:100%;max-width:480px;padding:18px"><img src="${u}" alt="Foto vom Ort" style="width:100%;max-height:70vh;object-fit:contain;border-radius:20px;display:block"><div class="footer-actions"><button class="btn ghost" style="background:var(--surface)" data-delphoto>Foto löschen</button><button class="btn" data-lbclose>Schließen</button></div></div></div>`;
+}
+function viewSheet(){
+  const r = S.sheet; const p = place(r.id);
+  return `<div class="scrim" data-scrim><div class="sheet" role="dialog" aria-label="Bewertung schreiben">
+    <h2>Wie war ${esc(p.name)}?</h2><p class="note">Deine Bewertung bleibt auf diesem Gerät.</p>
+    <div class="starpick" role="group" aria-label="Sterne">${[1,2,3,4,5].map(n=>`<button data-star="${n}" class="${r.s>=n?'on':''}" aria-label="${n} Sterne">★</button>`).join('')}</div>
+    <label class="l">Was war gut?</label>
+    <div class="chips">${ASPECTS.map(a=>`<button class="chip" data-asp="${a}" aria-pressed="${r.a.includes(a)}">${a}</button>`).join('')}</div>
+    <label class="l">Hat der Ort zu deinem VYBE gepasst?</label>
+    <div class="seg">${['Ja','Teils','Nein'].map(x=>`<button class="chip" data-fit="${x}" aria-pressed="${r.f===x}">${x}</button>`).join('')}</div>
+    <label class="l" for="rt">Dein Kommentar</label>
+    <textarea id="rt" placeholder="Was sollten andere wissen?">${esc(r.t)}</textarea>
+    <div class="footer-actions"><button class="btn ghost" data-sheetclose>Abbrechen</button><button class="btn" data-submit ${r.s?'':'disabled'}>Bewertung senden</button></div>
+  </div></div>`;
+}
+
+/* ============ RENDER ============ */
+const app = document.getElementById('app');
+function tabbar(){
+  const T=[['home','🏠','Start'],['discover','🧭','Entdecken'],['favs','💜','Favoriten'],['profile','🙂','Profil']];
+  return `<nav class="tabbar" aria-label="Hauptmenü">${T.map(([id,ic,l])=>`<button class="tab" data-tab="${id}" ${S.tab===id?'aria-current="page"':''}><span class="ic">${ic}</span>${l}</button>`).join('')}</nav>`;
+}
+function render(keepScroll){
+  const prev = app.querySelector('main'); const y = keepScroll&&prev?prev.scrollTop:0;
+  const dscroll = app.querySelector('.overlay'); const dy = keepScroll&&dscroll?dscroll.scrollTop:0;
+  const sscroll = app.querySelector('.sheet'); const sy = keepScroll&&sscroll?sscroll.scrollTop:0;
+  if(!S.onboarded){ app.innerHTML = viewOnboarding(); }
+  else{
+    const v = {home:viewHome,discover:viewDiscover,favs:viewFavs,profile:viewProfile}[S.tab]();
+    app.innerHTML = v + tabbar() + (S.detail?viewDetail():'') + (S.sheet?viewSheet():'') + (S.photoView!=null?viewLightbox():'');
+  }
+  const m = app.querySelector('main'); if(m) m.scrollTop=y;
+  const o = app.querySelector('.overlay'); if(o) o.style.animation = keepScroll?'none':'', o&&(o.scrollTop=dy);
+  const sh = app.querySelector('.sheet'); if(sh) sh.scrollTop=sy;
+}
+function toast(t){
+  const el=document.createElement('div'); el.className='toast'; el.textContent=t; el.setAttribute('role','status');
+  document.body.appendChild(el); setTimeout(()=>el.remove(),2200);
+}
+
+/* ============ EVENTS ============ */
+function go(tab){ S.tab=tab; S.detail=null; render(); }
+app.addEventListener('click',e=>{
+  const t = e.target.closest('[data-tab],[data-mood],[data-cat],[data-open],[data-fav],[data-close],[data-int],[data-next],[data-back],[data-finish],[data-redo],[data-reset],[data-review],[data-star],[data-asp],[data-fit],[data-sheetclose],[data-submit],[data-scrim],[data-photo],[data-delphoto],[data-lbclose]');
+  if(!t) return;
+  const d = t.dataset;
+  if('fav' in d){ e.stopPropagation(); const id=+d.fav; S.favs = isFav(id)?S.favs.filter(x=>x!==id):[...S.favs,id]; save(); render(true); toast(isFav(id)?'Zu Favoriten hinzugefügt':'Aus Favoriten entfernt'); return; }
+  if('photo' in d){ S.photoView=+d.photo; return render(true); }
+  if('lbclose' in d){ S.photoView=null; return render(true); }
+  if('delphoto' in d){ PHOTOS[S.detail].splice(S.photoView,1); savePhotos(); S.photoView=null; render(true); toast('Foto gelöscht'); return; }
+  if('tab' in d) return go(d.tab);
+  if('mood' in d){ S.mood = d.mood||null; S.cat='Alle'; S.tab='discover'; S.detail=null; return render(); }
+  if('cat' in d){ S.cat=d.cat; S.tab='discover'; S.detail=null; return render(); }
+  if('open' in d){ S.detail=+d.open; return render(); }
+  if('close' in d){ S.detail=null; return render(true); }
+  if('int' in d){ const k=d.int; S.interests = S.interests.includes(k)?S.interests.filter(x=>x!==k):[...S.interests,k]; return render(true); }
+  if('next' in d){ S.step++; return render(); }
+  if('back' in d){ S.step--; return render(); }
+  if('finish' in d){ S.onboarded=true; S.tab='home'; S.step=0; save(); return render(); }
+  if('redo' in d){ S.onboarded=false; S.step=0; return render(); }
+  if('reset' in d){ if(confirm('Alle Daten auf diesem Gerät löschen?')){ S = JSON.parse(JSON.stringify(DEFAULT)); PHOTOS={}; savePhotos(); save(); render(); } return; }
+  if('review' in d){ S.sheet={id:+d.review,s:0,a:[],f:'',t:''}; return render(true); }
+  if('star' in d){ S.sheet.t=document.getElementById('rt').value; S.sheet.s=+d.star; return render(true); }
+  if('asp' in d){ S.sheet.t=document.getElementById('rt').value; const a=d.asp; S.sheet.a = S.sheet.a.includes(a)?S.sheet.a.filter(x=>x!==a):[...S.sheet.a,a]; return render(true); }
+  if('fit' in d){ S.sheet.t=document.getElementById('rt').value; S.sheet.f = S.sheet.f===d.fit?'':d.fit; return render(true); }
+  if('sheetclose' in d || ('scrim' in d && e.target===t)){ S.sheet=null; return render(true); }
+  if('submit' in d){
+    const r=S.sheet; r.t=document.getElementById('rt').value.trim()||'(Kein Kommentar)';
+    (S.reviews[r.id] = S.reviews[r.id]||[]).push({s:r.s,a:r.a,f:r.f,t:r.t});
+    S.sheet=null; save(); render(true); toast('Danke für deine Bewertung!');
+  }
+});
+app.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-open]')){ e.preventDefault(); S.detail=+e.target.dataset.open; render(); } });
+app.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.id==='q'){ S.q=t.value; document.getElementById('list').innerHTML=listHtml(); }
+  if(t.dataset.range){ const k=t.dataset.range; S.vibe[k]=+t.value; document.getElementById('w-'+k).textContent=DIMS[k].words[bucket(S.vibe[k])]; }
+});
+app.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.id!=='photoin'||!t.files||!t.files[0]) return;
+  const id=S.detail, f=t.files[0], url=URL.createObjectURL(f), img=new Image();
+  img.onload=()=>{
+    const sc=Math.min(1,900/Math.max(img.width,img.height));
+    const c=document.createElement('canvas'); c.width=Math.round(img.width*sc); c.height=Math.round(img.height*sc);
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(url);
+    (PHOTOS[id]=PHOTOS[id]||[]).unshift(c.toDataURL('image/jpeg',0.72));
+    if(!savePhotos()){ PHOTOS[id].shift(); toast('Speicher voll – lösche zuerst ein altes Foto'); } else toast('Foto hinzugefügt');
+    render(true);
+  };
+  img.onerror=()=>toast('Dieses Bild konnte nicht gelesen werden');
+  img.src=url;
+});
+render();
+</script>
+</body>
+</html>
